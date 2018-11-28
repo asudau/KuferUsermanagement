@@ -1,0 +1,6 @@
+pluginname=KuferUsermanagement
+pluginclassname=KuferUsermanagement
+origin=elanev
+version=0.2
+studipMinVersion=3.1
+studipMaxVersion=3.4.99
