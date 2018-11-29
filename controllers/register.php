@@ -21,6 +21,13 @@ class RegisterController extends StudipController {
         $this->Email = $this->user->email;
     }
     
+    public function agree_action($user_id)
+    {
+        $this->user = User::find($user_id);
+        $this->username = $this->user->username;
+        $this->Email = $this->user->email;
+    }
+    
     public function claim_account_action($user_id) //aus Seminar_Register_Auth    
     {
         //TODO Nutzungsbedingungen etc abfragen?
