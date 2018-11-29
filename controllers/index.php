@@ -38,6 +38,14 @@ class IndexController extends StudipController {
 
     public function index_action(){
         //get teilnehmende where exists kufer mapping and claimed = false
+        $this->course = Course::findCurrent();
+        $this->members = [];
+        $this->account_status = [];
+        foreach($this->course->members as $member){
+            $mapping = KuferMapping::findOneBySQL('studip_id = :user_id', [':user_id' => $member->user_id]);
+            $this->members[] = $member;
+            $this->account_status[$member->user_id] = KuferMapping::getAccountStatusText($member->user_id);
+        }
         //action: registrierungsauffforderung versenden
         //freie registrierung??? mit username und user_id
     }
