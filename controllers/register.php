@@ -107,6 +107,9 @@ class RegisterController extends StudipController {
             $this->auth["perm"] = $user->perms;
             //return $user->user_id;
             //TODO set account claimed
+            $mapping = KuferMapping::findOneBySQL('studip_id = :user_id', [':user_id' => $user->user_id]);
+            $mapping->claimed = '1';
+            $mapping->store();
         }
         $this->render_nothing();
     }
