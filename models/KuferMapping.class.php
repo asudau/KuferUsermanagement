@@ -31,6 +31,10 @@ class KuferMapping extends SimpleORMap
     
     }
     
+    public function userExists(){
+        return User::find($this->studip_id);
+    }
+    
     public static function getAccountStatus($user_id){
         $mapping = KuferMapping::findOneBySQL('studip_id = :user_id', [':user_id' => $user_id]);
             if($mapping){
@@ -41,9 +45,9 @@ class KuferMapping extends SimpleORMap
     public static function getAccountStatusText($user_id){
         switch(self::getAccountStatus($user_id)){
             case 1:
-                return 'Account wurde manuell angelegt';
+                return 'Account wurde manuell angelegt und ist nicht mit Kufer verknüpft';
             case 2:
-                return 'Account noch nicht eingerichtet';
+                return 'Account wurde vom Nutzer noch nicht eingerichtet';
             case 3:
                 return 'Account eingerichtet';
         }
