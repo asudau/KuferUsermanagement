@@ -25,6 +25,7 @@ jQuery(document).ready(function() {
 <form name="login" action="<?= $controller->url_for('register/claim_account/' . $user->user_id) ?>" method="post" class="default">
     <?= CSRFProtection::tokenTag() ?>
     <input type="hidden" name="login_ticket" value="<?= Seminar_Session::get_ticket() ?>">
+    <input type="hidden" name="username" value="<?= htmlReady($username) ?>">
 
     <fieldset>
         <legend><?= _('Herzlich willkommen!') ?></legend>
@@ -33,8 +34,7 @@ jQuery(document).ready(function() {
 
         <label for="username">
             <?= _('Benutzername') ?>
-            <em class="required"></em>
-            <input type="text" name="username" id="username"
+            <input disabled type="text" 
                    onchange="STUDIP.register.checkusername()"
                    value="<?= htmlReady($username) ?>"
                    autofocus
