@@ -8,7 +8,7 @@ class IndexController extends StudipController {
     {
         parent::__construct($dispatcher);
         $this->plugin = $dispatcher->plugin;
-        Navigation::activateItem('course/contact');
+        Navigation::activateItem('course/kufer_accounts');
     }
 
     public function before_filter(&$action, &$args)
@@ -17,86 +17,95 @@ class IndexController extends StudipController {
         $this->course = Course::findCurrent();
         
         PageLayout::setTitle($this->course->getFullname()." - " ._("Kufer Nutzerverwaltung"));
-            
-        $navcreate = new LinksWidget();
-        $navcreate->setTitle('Navigation');
-        $navcreate->addLink("Nutzer anlegen", $this->url_for('index/create'));
-        
-        Sidebar::get()->addWidget($navcreate);
-        
+           
+        $item = new Navigation(_('Übersicht'), $this->url_for('index'));
+        Navigation::getItem('course/kufer_accounts')->addSubNavigation('index', $item);
+
         if($GLOBALS['perm']->have_studip_perm('dozent', $this->course->id)){
             $actions = new ActionsWidget();
             $actions->setTitle(_('Aktionen'));
 
             $actions->addLink(
-            'Nutzer anlegen',
-            $this->url_for('index/create'), Icon::create('admin', 'clickable')); 
+            'Einladung versenden',
+            $this->url_for('index/send_register_invitation'), Icon::create('mail', 'clickable')); 
 
             Sidebar::get()->addWidget($actions);
         }
     }
 
     public function index_action(){
+        Navigation::activateItem('course/kufer_accounts/index');
         //get teilnehmende where exists kufer mapping and claimed = false
         $this->course = Course::findCurrent();
         $this->members = [];
         $this->account_status = [];
+        $this->invitations = [];
         foreach($this->course->members as $member){
-            $mapping = KuferMapping::findOneBySQL('studip_id = :user_id', [':user_id' => $member->user_id]);
+            $mapping = KuferMapping::findOneByStudip_id($member->user_id);
             $this->members[] = $member;
             $this->account_status[$member->user_id] = KuferMapping::getAccountStatusText($member->user_id);
+            $this->invitations[$member->user_id] = KuferRegisterAccountInvitation::findOneByUser_id($member->user_id);
         }
         //action: registrierungsauffforderung versenden
         //freie registrierung??? mit username und user_id
     }
+    
+    public function send_register_invitation_action (){
+        $this->course = Course::findCurrent();
+        $invitations = KuferRegisterAccountInvitation::findBySeminar_id($this->course->id);
 
-    public function create_action()
-    {
-      $user = $this->new_user();  
-
-//      if ($studip_user){
-//
-//           $entry = KuferMapping::findOneByStudip_id($studip_user->id);
-//           if(!$entry){
-//                $entry = new KuferMapping();
-//                $entry->studip_id = $studip_user->id;
-//                $entry->store();
-//           }
-//            $studip_user->id = $entry->ID;  
-//            return $studip_user;
-//      } else {
-
-          $user->email = 'asudau@uos.de';
-          $user->first_name = 'unbekannt';
-          $user->last_name = 'unbekannt';
-          
-          $i = 1;
-          $user_name = substr($this->sonderzeichen($user->first_name), 0, $i) . $this->sonderzeichen($user->last_name);
-          while (Studip_User::find_by_user_name($user_name) && $i<= strlen($this->sonderzeichen($user->first_name))){
-              $i++;
-              $user_name = substr($this->sonderzeichen($user->first_name), 0, $i) . $this->sonderzeichen($user->last_name);
-          }
-
-          
-          
-          $md5_user = new User();
-          $md5_user->username = $user_name;
-          $md5_user->vorname = '';
-          $md5_user->nachname = 'Vorläufiger Nutzer';
-          $md5_user->email = $user->email;
-          $md5_user->perms = $user->permission;
-          $md5_user->auth_plugin = $user->auth_plugin;
-          
-          if (!$md5_user->store())
-              return new Studip_Ws_Fault(self::parse_msg_to_clean_text($user->error));
-
-          $entry = new KuferMapping();
-          $entry->studip_id = $md5_user->user_id;
-          $entry->claimed = false;
-          $entry->store();
-          $user->id = $entry->ID;
-        
+        foreach($this->course->members as $member){
+            $mapping = KuferMapping::findOneByStudip_id($member->user_id);
+            if(!$invitations[$member->user_id] && $mapping){
+                
+                //TODO send Invitation
+                $invitation = new KuferRegisterAccountInvitation();
+                $invitation->user_id = $member->user_id;
+                $invitation->seminar_id = $this->course->id;
+                $invitation->invited_by = User::findCurrent()->id;
+                $invitation->date = time();
+                $invitation->store();
+            }
+        }
+        $this->render_nothing();
     }
+    
+
+//    public function create_action()
+//    {
+//      $user = $this->new_user();  
+//
+//          $user->email = 'asudau@uos.de';
+//          $user->first_name = 'unbekannt';
+//          $user->last_name = 'unbekannt';
+//          
+//          $i = 1;
+//          $user_name = substr($this->sonderzeichen($user->first_name), 0, $i) . $this->sonderzeichen($user->last_name);
+//          while (Studip_User::find_by_user_name($user_name) && $i<= strlen($this->sonderzeichen($user->first_name))){
+//              $i++;
+//              $user_name = substr($this->sonderzeichen($user->first_name), 0, $i) . $this->sonderzeichen($user->last_name);
+//          }
+//
+//          
+//          
+//          $md5_user = new User();
+//          $md5_user->username = $user_name;
+//          $md5_user->vorname = '';
+//          $md5_user->nachname = 'Vorläufiger Nutzer';
+//          $md5_user->email = $user->email;
+//          $md5_user->perms = $user->permission;
+//          $md5_user->auth_plugin = $user->auth_plugin;
+//          
+//          if (!$md5_user->store())
+//              return new Studip_Ws_Fault(self::parse_msg_to_clean_text($user->error));
+//
+//          $entry = new KuferMapping();
+//          $entry->studip_id = $md5_user->user_id;
+//          $entry->claimed = false;
+//          $entry->store();
+//          $user->id = $entry->ID;
+//        
+//    }
    
     
     private function get_user_data($course_id, $status){
