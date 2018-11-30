@@ -27,7 +27,7 @@ class KuferUsermanagement extends StudIPPlugin implements StandardPlugin
         global $perm;
         if ($perm->have_studip_perm('tutor', $course_id)){
             return array(
-                'contact' => new Navigation(
+                'kufer_accounts' => new Navigation(
                     'Kuferanbindung',
                     PluginEngine::getURL($this, array(), 'index')
                 )
