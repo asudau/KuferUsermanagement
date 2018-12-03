@@ -54,7 +54,7 @@ class KuferMapping extends SimpleORMap
             case 3:
                 return 'Account durch Nutzer eingerichtet am ' . date('d.m.Y', KuferMapping::findOneByStudip_id($user_id)->claimed);
             case 4: //temporäre lösung für ammerland
-                return 'Nutzer hat Zugangdaten erhalten.';
+                return 'Nutzer hat Zugangsdaten erhalten.';
         }
     }
 }
