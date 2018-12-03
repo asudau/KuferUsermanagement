@@ -36,8 +36,11 @@ class KuferMapping extends SimpleORMap
     }
     
     public static function getAccountStatus($user_id){
-        $mapping = KuferMapping::findOneBySQL('studip_id = :user_id', [':user_id' => $user_id]);
+        $mapping = KuferMapping::findOneByStudip_id($user_id);
             if($mapping){
+                if ($mapping->claimed == 1543849204){
+                   return 4; //temporäre lösung für ammerland
+                }
                 return $mapping->claimed ? 3 : 2;
             } else return 1;
     }
@@ -49,7 +52,9 @@ class KuferMapping extends SimpleORMap
             case 2:
                 return 'Account wurde vom Nutzer noch nicht eingerichtet';
             case 3:
-                return 'Account eingerichtet';
+                return 'Account durch Nutzer eingerichtet am ' . date('d.m.Y', KuferMapping::findOneByStudip_id($user_id)->claimed);
+            case 4: //temporäre lösung für ammerland
+                return 'Nutzer hat Zugangdaten erhalten.';
         }
     }
 }
