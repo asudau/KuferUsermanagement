@@ -59,6 +59,7 @@ class IndexController extends StudipController {
             if(!$invitations[$member->user_id] && $mapping){
                 
                 //TODO send Invitation
+                $this->sendRegisterMail($member->user_id, $this->course->name);
                 $invitation = new KuferRegisterAccountInvitation();
                 $invitation->user_id = $member->user_id;
                 $invitation->seminar_id = $this->course->id;
@@ -174,15 +175,59 @@ class IndexController extends StudipController {
     
     function sonderzeichen($string)
     {
-     $string = str_replace("ä", "ae", $string);
-     $string = str_replace("ü", "ue", $string);
-     $string = str_replace("ö", "oe", $string);
-     $string = str_replace("Ä", "Ae", $string);
-     $string = str_replace("Ü", "Ue", $string);
-     $string = str_replace("Ö", "Oe", $string);
-     $string = str_replace("ß", "ss", $string);
-     $string = str_replace("´", "", $string);
-     return $string;
+        $string = str_replace("ä", "ae", $string);
+        $string = str_replace("ü", "ue", $string);
+        $string = str_replace("ö", "oe", $string);
+        $string = str_replace("Ä", "Ae", $string);
+        $string = str_replace("Ü", "Ue", $string);
+        $string = str_replace("Ö", "Oe", $string);
+        $string = str_replace("ß", "ss", $string);
+        $string = str_replace("´", "", $string);
+        return $string;
+    }
+    
+    private static function sendRegisterMail($user_id, $kursname){
+        
+        $user = New User($user_id);
+        $contact_mail = $user->Email; //TODO get user Mail
+        
+        
+        $mailtext = 'Willkommen bei der              
+                ' . $GLOBALS['UNI_NAME_CLEAN']   . '!
+                    
+                Sie haben sich für den Kurs ' . $kursname . ' an der ' . $GLOBALS['UNI_NAME_CLEAN'] . ' angemeldet.
+                    
+                Die ' . $GLOBALS['UNI_NAME_CLEAN'] . ' stellt Ihnen eine online-Lernpattform zur Verfügung, welche zum Beispiel Kommunikation untersützt,
+                die zusätzliche Bereitstellung von Kursinhalten ermöglicht und vieles mehr.
+                
+                Ob Sie dieses Angebot nutzen möchten, entscheiden Sie selbst.
+                
+                Bei Interesse können sie sich über die folgende URL einen Account einrichten:
+                (Nach der Registrierung haben Sie sofort Zugriff auf Ihren Kurs)
+                
+                ' . $this->url_for('register/agree/') . $user_id;
+            
+
+            $empfaenger = $contact_mail;
+            //$absender   = "asudau@uos.de";
+            $betreff    = 'Willkommen bei der ' . $GLOBALS['UNI_NAME_CLEAN'];
+
+            $template = $GLOBALS['template_factory']->open('mail/html');
+            $template->set_attribute('lang', 'de');
+            $template->set_attribute('message', $mailtext);
+            $mailhtml = $template->render();
+            
+            
+            return StudipMail::sendMessage($empfaenger, $betreff, $mailtext, $mailhtml);
+            /**
+            return $mail->addRecipient($empfaenger)
+                 ->setReplyToEmail('')
+                 ->setSenderEmail('el4@elan-ev.de')
+                 ->setSenderName($GLOBALS['UNI_NAME_CLEAN']) //Globals UNI_NAME
+                 ->setSubject($betreff)
+                 ->setBodyText($mailtext)
+                 ->send();
+                 **/
     }
 
 }
