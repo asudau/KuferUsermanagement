@@ -47,7 +47,7 @@ class RegisterController extends StudipController {
         $validator->timeout = 10; // Wie lange warten wir auf eine Antwort des Mailservers?
 
         if (!Seminar_Session::check_ticket(Request::option('login_ticket'))) {
-            $this->error_msg = "Ungültiges Login Ticket";
+            $this->error_msg = "Ungültiges Login Ticket. Versuchen Sie es bitte nochmal.";
         }
 
         // accept only registered domains if set
