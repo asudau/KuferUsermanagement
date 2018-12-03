@@ -96,7 +96,7 @@ jQuery(document).ready(function() {
                 <?= _("weiblich") ?>
             </label>
         </section>
-
+        
         <label for="email">
             <?= _('E-Mail') ?>
         <? if (!trim($email_restriction)): ?>
@@ -123,6 +123,23 @@ jQuery(document).ready(function() {
             </select>
         </section>
     <? endif; ?>
+    
+    <label for="account_settings">
+        <?= _('Wie lange soll Ihr Account bestehen bleiben?') ?>
+    </label>
+
+    <section class="vgroup">
+        <label>
+            <input type="radio" checked name="account_settings" value="0">
+            <?= _("Accountlöschung gemäß Nutzungsbedingungen (Nach längerer Inaktivität mit vorheriger Benachrichtigung oder auf expliziten Wunsch)") ?>
+        </label>
+
+        <label>
+            <input type="radio"  name="account_settings" value="1">
+            <?= _("Account automatisch nach Kursende löschen") ?>
+        </label>
+
+    </section>
     </fieldset>
 
     <footer>
