@@ -31,6 +31,7 @@ class RegisterController extends StudipController {
     public function claim_account_action($user_id) //aus Seminar_Register_Auth    
     {
         $this->error_msg = "";
+        $this->info_msg = "";
         //TODO check if account unclaimed!!!
         //$this->auth["uname"] = Request::username('username'); // This provides access for "crcregister.ihtml"
         
@@ -84,16 +85,16 @@ class RegisterController extends StudipController {
         $REMOTE_ADDR = $_SERVER["REMOTE_ADDR"];
         $Zeit = date("H:i:s, d.m.Y", time());
 
-        if (!$validator->ValidateEmailHost($Email)) { // Mailserver nicht erreichbar, ablehnen
-            $this->error_msg = $this->error_msg . _("Der Mailserver ist nicht erreichbar, bitte überprüfen Sie, ob Sie E-Mails mit der angegebenen Adresse verschicken und empfangen können!") . "<br>";
-        } else { // Server ereichbar
-            if (!$validator->ValidateEmailBox($Email)) { // aber user unbekannt. Mail an abuse!
-                StudipMail::sendAbuseMessage("Register", "Emailbox unbekannt\n\nUser: $username\nEmail: $Email\n\nIP: $REMOTE_ADDR\nZeit: $Zeit\n");
-                $this->error_msg = $this->error_msg . _("Die angegebene E-Mail-Adresse ist nicht erreichbar, bitte überprüfen Sie Ihre Angaben!") . "<br>";
-            } else {
-                ; // Alles paletti, jetzt kommen die Checks gegen die Datenbank...
-            }
-        }
+//        if (!$validator->ValidateEmailHost($Email)) { // Mailserver nicht erreichbar, ablehnen
+//            $this->error_msg = $this->error_msg . _("Der Mailserver ist nicht erreichbar, bitte überprüfen Sie, ob Sie E-Mails mit der angegebenen Adresse verschicken und empfangen können!") . "<br>";
+//        } else { // Server ereichbar
+//            if (!$validator->ValidateEmailBox($Email)) { // aber user unbekannt. Mail an abuse!
+//                StudipMail::sendAbuseMessage("Register", "Emailbox unbekannt\n\nUser: $username\nEmail: $Email\n\nIP: $REMOTE_ADDR\nZeit: $Zeit\n");
+//                $this->info_msg = _("Die angegebene E-Mail-Adresse ist nicht erreichbar, überprüfen Sie zur Sicherheit Ihre Angaben!") . "<br>";
+//            } else {
+//                ; // Alles paletti, jetzt kommen die Checks gegen die Datenbank...
+//            }
+//        }
         
         if($this->error_msg){
             PageLayout::postMessage(MessageBox::error($this->error_msg));
