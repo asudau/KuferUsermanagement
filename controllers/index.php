@@ -186,18 +186,18 @@ class IndexController extends StudipController {
         return $string;
     }
     
-    private static function sendRegisterMail($user_id, $kursname){
+    private function sendRegisterMail($user_id, $kursname){
         
         $user = New User($user_id);
         $contact_mail = $user->Email; //TODO get user Mail
         
         
-        $mailtext = 'Willkommen bei der              
-                ' . $GLOBALS['UNI_NAME_CLEAN']   . '!
+        $mailtext = "Willkommen bei der              
+                " . $GLOBALS['UNI_NAME_CLEAN']   . "!
                     
-                Sie haben sich für den Kurs ' . $kursname . ' an der ' . $GLOBALS['UNI_NAME_CLEAN'] . ' angemeldet.
+                Sie haben sich für den Kurs " . $kursname . " an der " . $GLOBALS['UNI_NAME_CLEAN'] . " angemeldet.
                     
-                Die ' . $GLOBALS['UNI_NAME_CLEAN'] . ' stellt Ihnen eine online-Lernpattform zur Verfügung, welche zum Beispiel Kommunikation untersützt,
+                Die " . $GLOBALS['UNI_NAME_CLEAN'] . " stellt Ihnen eine online-Lernpattform zur Verfügung, welche zum Beispiel Kommunikation untersützt,
                 die zusätzliche Bereitstellung von Kursinhalten ermöglicht und vieles mehr.
                 
                 Ob Sie dieses Angebot nutzen möchten, entscheiden Sie selbst.
@@ -205,7 +205,7 @@ class IndexController extends StudipController {
                 Bei Interesse können sie sich über die folgende URL einen Account einrichten:
                 (Nach der Registrierung haben Sie sofort Zugriff auf Ihren Kurs)
                 
-                ' . $this->url_for('register/agree/') . $user_id;
+                " . $GLOBALS['ABSOLUTE_URI_STUDIP'] . "plugins.php/kuferusermanagement/register/agree/" . $user_id;
             
 
             $empfaenger = $contact_mail;
