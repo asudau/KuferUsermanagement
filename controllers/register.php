@@ -38,6 +38,8 @@ class RegisterController extends StudipController {
         $Vorname = trim(Request::get('Vorname'));
         $Nachname = trim(Request::get('Nachname'));
         
+        //TODO account_settings setzen in Usermanagement delete_mode
+        
         $user = User::find($user_id);
         if ($user->username != $username){
             $this->error_msg = "Probleme mit dem Nutzernamen " . $user->username . ' ungleich ' .$username ;
@@ -108,13 +110,13 @@ class RegisterController extends StudipController {
             $user->geschlecht = Request::int('geschlecht');
 
             if ($user->store()) {
-                Seminar_Register_Auth::sendValidationMail($user);
+                self::sendValidationMail($user);
                 $this->auth["perm"] = $user->perms;
                 //return $user->user_id;
                 //TODO set account claimed
                 $mapping = KuferMapping::findOneBySQL('studip_id = :user_id', [':user_id' => $user->user_id]);
                 if ($mapping){
-                    $mapping->claimed = '1';
+                    $mapping->claimed = time();
                     $mapping->store();
                     PageLayout::postMessage(MessageBox::success(_("Ihre Registrierung wurde erfolgreich vorgenommen. ") . 
                         _("Das System wird Ihnen zur Bestätigung eine E-Mail zusenden.")));
@@ -144,6 +146,38 @@ class RegisterController extends StudipController {
         $args[0] = $to;
 
         return PluginEngine::getURL($this->dispatcher->plugin, $params, join('/', $args));
+    }
+    
+    public static function sendValidationMail($user){
+        global $_language_path;
+
+        // if no user-object is given interpret it as a user-id
+        if (is_string($user)) {
+            $user = new User($user);
+        }
+
+        // template-variables for the include partial
+        $Zeit     = date("H:i:s, d.m.Y", $time());
+        $username = $user->username;
+        $Vorname  = $user->vorname;
+        $Nachname = $user->nachname;
+        $Email    = $user->email;
+
+        // (re-)send the confirmation mail
+        $to     = $user->email;
+        $secret = md5($user->user_id .':'. self::$magic);
+        $url    = $GLOBALS['ABSOLUTE_URI_STUDIP'] . "email_validation.php?secret=" . $secret;
+        $mail   = new StudipMail();
+        $abuse  = $mail->getReplyToEmail();
+
+        // include language-specific subject and mailbody
+        include_once("locale/$_language_path/LC_MAILS/register_mail.inc.php");
+
+        // send the mail
+        $mail->setSubject($subject)
+            ->addRecipient($to)
+            ->setBodyText($mailbody)
+            ->send();
     }
       
 }
