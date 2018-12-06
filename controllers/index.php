@@ -58,9 +58,9 @@ class IndexController extends StudipController {
 
         foreach($this->course->members as $member){
             $mapping = KuferMapping::findOneByStudip_id($member->user_id);
-            if(!$invitations[$member->user_id] && $mapping){
-                
-                //TODO send Invitation
+            $user_active = $this->get_last_lifesign($member->user_id, $this->course->id) || $mapping->claimed;
+            if(!$invitations[$member->user_id] && $mapping && !$user_active){
+                //send Invitation
                 $this->sendRegisterMail($member->user_id, $this->course->name);
                 $invitation = new KuferRegisterAccountInvitation();
                 $invitation->user_id = $member->user_id;
