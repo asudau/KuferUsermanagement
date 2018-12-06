@@ -40,12 +40,14 @@ class IndexController extends StudipController {
         $this->members = [];
         $this->account_status = [];
         $this->invitations = [];
+        $this->active = [];
         foreach($this->course->members as $member){
             $mapping = KuferMapping::findOneByStudip_id($member->user_id);
             $this->members[] = $member;
             $this->account_status[$member->user_id] = KuferMapping::getAccountStatusText($member->user_id);
             $this->invitations[$member->user_id] = KuferRegisterAccountInvitation::findOneByUser_id($member->user_id);
-        }
+            $this->active[$member->user_id] = $this->get_last_lifesign($member->user_id, $this->course->id) || $mapping->claimed;
+        } 
         //action: registrierungsauffforderung versenden
         //freie registrierung??? mit username und user_id
     }
@@ -109,19 +111,14 @@ class IndexController extends StudipController {
 //    }
    
     
-    private function get_user_data($course_id, $status){
+    private function get_last_lifesign($user_id, $course_id){
         $db = DBManager::get();
-        $query = "SELECT u.username, u.user_id, u.Vorname, u.Nachname, uo.last_lifesign, COUNT(fe.topic_id) AS Forenbeitraege
-			FROM seminar_user su 
-                        LEFT JOIN auth_user_md5 u ON u.user_id = su.user_id
-			LEFT JOIN user_online uo ON u.user_id = uo.user_id
-                        LEFT JOIN forum_entries fe ON (u.user_id = fe.user_id AND fe.seminar_id = :sem_id)
-                        WHERE su.Seminar_id = :sem_id
-                        AND su.status = :status
-			GROUP BY u.user_id";
+        $query = "SELECT uo.last_lifesign
+                        FROM user_online uo
+                        WHERE uo.user_id = :user_id";
                             
         $statement = $db->prepare($query);
-        $statement->execute(array('sem_id' => $course_id, 'status' =>$status));
+        $statement->execute(array('user_id' => $user_id));
         return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
     
