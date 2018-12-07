@@ -190,7 +190,7 @@ class RegisterController extends StudipController {
         $mail   = new StudipMail();
         $abuse  = $mail->getReplyToEmail();
 
-        $subject="Bestätigungsmail des OHN-Kursportals";
+        $subject="Registrierung erfolgreich - " . $GLOBALS['UNI_NAME_CLEAN'];
         
         $mailbody="Willkommen im Online-Portal der " . $GLOBALS['UNI_NAME_CLEAN'] . " \n\n"
         ."Sie haben sich um $Zeit mit folgenden Angaben angemeldet:\n\n"
