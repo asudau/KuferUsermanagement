@@ -58,7 +58,7 @@ class IndexController extends StudipController {
 
         foreach($this->course->members as $member){
             $mapping = KuferMapping::findOneByStudip_id($member->user_id);
-            $user_active = $this->get_last_lifesign($member->user_id, $this->course->id) || $mapping->claimed;
+            $user_active = ($this->get_last_lifesign($member->user_id, $this->course->id) || $mapping->claimed);
             if(!$invitations[$member->user_id] && $mapping && !$user_active){
                 //send Invitation
                 $this->sendRegisterMail($member->user_id, $this->course->name);
@@ -70,7 +70,7 @@ class IndexController extends StudipController {
                 $invitation->store();
             }
         }
-        $this->render_nothing();
+        $this->redirect('index');
     }
     
 
