@@ -25,6 +25,14 @@ class RegisterController extends StudipController {
     
     public function agree_action($user_id)
     {
+        $mapping = KuferMapping::findOneBySQL('studip_id = :user_id', [':user_id' => $user_id]);
+        if ($mapping){
+            if ($mapping->claimed || $this->get_last_lifesign($user_id)){
+                PageLayout::postMessage(MessageBox::error( "Dieser Account wurde bereits aktiviert."));
+                $this->render_action('decline');
+            }
+        }
+        
         $this->user = User::find($user_id);
         $this->username = $this->user->username;
         $this->Email = $this->user->email;
@@ -35,6 +43,13 @@ class RegisterController extends StudipController {
         $this->error_msg = "";
         $this->info_msg = "";
         //TODO check if account unclaimed!!!
+        $mapping = KuferMapping::findOneBySQL('studip_id = :user_id', [':user_id' => $user_id]);
+        if ($mapping){
+            if ($mapping->claimed || $this->get_last_lifesign($user_id)){
+                PageLayout::postMessage(MessageBox::error( "Dieser Account wurde bereits aktiviert."));
+            }
+        }
+        //
         //$this->auth["uname"] = Request::username('username'); // This provides access for "crcregister.ihtml"
         
         $username = trim(Request::get('username')); //brauchen wir für späteren vergleich
@@ -132,6 +147,9 @@ class RegisterController extends StudipController {
         }
     }
 
+    public function decline_action(){
+        
+    }
     
     // customized #url_for for plugins
     public function url_for($to)
@@ -193,5 +211,17 @@ class RegisterController extends StudipController {
             ->setBodyText($mailbody)
             ->send();
     }
+    
+    private function get_last_lifesign($user_id){
+        $db = DBManager::get();
+        $query = "SELECT uo.last_lifesign
+                        FROM user_online uo
+                        WHERE uo.user_id = :user_id";
+                            
+        $statement = $db->prepare($query);
+        $statement->execute(array('user_id' => $user_id));
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
       
 }

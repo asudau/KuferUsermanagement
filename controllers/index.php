@@ -46,7 +46,7 @@ class IndexController extends StudipController {
             $this->members[] = $member;
             $this->account_status[$member->user_id] = KuferMapping::getAccountStatusText($member->user_id);
             $this->invitations[$member->user_id] = KuferRegisterAccountInvitation::findOneByUser_id($member->user_id);
-            $this->active[$member->user_id] = $this->get_last_lifesign($member->user_id, $this->course->id) || $mapping->claimed;
+            $this->active[$member->user_id] = $this->get_last_lifesign($member->user_id) || $mapping->claimed;
         } 
         //action: registrierungsauffforderung versenden
         //freie registrierung??? mit username und user_id
@@ -111,7 +111,7 @@ class IndexController extends StudipController {
 //    }
    
     
-    private function get_last_lifesign($user_id, $course_id){
+    private function get_last_lifesign($user_id){
         $db = DBManager::get();
         $query = "SELECT uo.last_lifesign
                         FROM user_online uo
