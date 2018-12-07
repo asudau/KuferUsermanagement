@@ -30,7 +30,8 @@ class IndexController extends StudipController {
             $this->url_for('index/send_register_invitation'), Icon::create('mail', 'clickable')); 
 
             Sidebar::get()->addWidget($actions);
-        }
+        } else
+            throw new AccessDeniedException(_("Sie haben keine Berechtigung."));
     }
 
     public function index_action(){
