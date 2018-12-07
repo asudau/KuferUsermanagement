@@ -2,6 +2,8 @@
 
 class RegisterController extends StudipController {
 
+    protected static $magic = 'dsdfjhgretha';
+    
     public function __construct($dispatcher)
     {
         parent::__construct($dispatcher);
@@ -112,7 +114,7 @@ class RegisterController extends StudipController {
 
             if ($user->store()) {
                 self::sendValidationMail($user);
-                $this->auth["perm"] = $user->perms;
+                //$this->auth["perm"] = $user->perms;
                 //return $user->user_id;
                 //TODO set account claimed
                 $mapping = KuferMapping::findOneBySQL('studip_id = :user_id', [':user_id' => $user->user_id]);
@@ -158,7 +160,7 @@ class RegisterController extends StudipController {
         }
 
         // template-variables for the include partial
-        $Zeit     = date("H:i:s, d.m.Y", $time());
+        $Zeit     = date("H:i:s, d.m.Y", time());
         $username = $user->username;
         $Vorname  = $user->vorname;
         $Nachname = $user->nachname;
@@ -166,13 +168,24 @@ class RegisterController extends StudipController {
 
         // (re-)send the confirmation mail
         $to     = $user->email;
-        $secret = md5($user->user_id .':'. self::$magic);
-        $url    = $GLOBALS['ABSOLUTE_URI_STUDIP'] . "email_validation.php?secret=" . $secret;
+        $url    = $GLOBALS['ABSOLUTE_URI_STUDIP'];
         $mail   = new StudipMail();
         $abuse  = $mail->getReplyToEmail();
 
-        // include language-specific subject and mailbody
-        include_once("locale/$_language_path/LC_MAILS/register_mail.inc.php");
+        $subject="Bestätigungsmail des OHN-Kursportals";
+        
+        $mailbody="Willkommen im Online-Portal der " . $GLOBALS['UNI_NAME_CLEAN'] . " \n\n"
+        ."Sie haben sich um $Zeit mit folgenden Angaben angemeldet:\n\n"
+        ."Benutzername: $username\n"
+        ."Vorname: $Vorname\n"
+        ."Nachname: $Nachname\n"
+        ."E-Mail-Adresse: $Email\n\n"
+        ."Um sich einzuloggen öffnen Sie bitte folgenden Link\n\n"
+        ."$url\n\n"
+        ."in Ihrem Browser.\n"
+        ."Wahrscheinlich unterstützt Ihr E-Mail-Programm ein einfaches Anklicken des Links.\n"
+        ."Ansonsten müssen Sie Ihren Browser öffnen und den Link komplett in die Adress-Zeile kopieren.\n\n"  
+        ."Bei Fragen wenden Sie sich an $abuse\n";
 
         // send the mail
         $mail->setSubject($subject)
