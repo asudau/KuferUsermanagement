@@ -1,6 +1,4 @@
 
-<?= get_title_for_status('autor', 2)?> haben Zugriff auf diesen Kurs ab: <?= $coursebegin ?>
-
 
 <h1><?= get_title_for_status('dozent', 2)?>:</h1>
 <table id="keywordstt" class="sortable-table default">
