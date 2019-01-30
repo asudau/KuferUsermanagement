@@ -38,6 +38,7 @@ class IndexController extends StudipController {
         Navigation::activateItem('course/kufer_accounts/index');
         //get teilnehmende where exists kufer mapping and claimed = false
         $this->course = Course::findCurrent();
+        $this->coursebegin = $this->course->dates[0]->date;
         $this->members = [];
         $this->account_status = [];
         $this->invitations = [];
@@ -53,16 +54,21 @@ class IndexController extends StudipController {
         //freie registrierung??? mit username und user_id
     }
     
-    public function send_register_invitation_action (){
+    public function send_register_invitation_action ($user_id = NULL){
         $this->course = Course::findCurrent();
         $invitations = KuferRegisterAccountInvitation::findBySeminar_id($this->course->id);
+        $nomail = true;
 
-        foreach($this->course->members as $member){
-            $mapping = KuferMapping::findOneByStudip_id($member->user_id);
-            $user_active = ($this->get_last_lifesign($member->user_id, $this->course->id) || $mapping->claimed);
-            if(!$invitations[$member->user_id] && $mapping && !$user_active){
-                //send Invitation
-                $this->sendRegisterMail($member->user_id, $this->course->name);
+        //einzelne Einladung
+        if ($user_id){
+            $user = User::find($user_id);
+            $this->sendRegisterMail($user_id, $this->course->name);
+            PageLayout::postMessage(MessageBox::success(_("Einladung versendet an " . $user->email)));
+            $invitation = KuferRegisterAccountInvitation::findOneBySQL('user_id = :user_id AND seminar_id = :seminar_id', ['user_id' => $user_id, 'seminar_id' => $this->course->id]);
+            if ($invitation){
+                $invitation->date = time();
+                $invitation->store();
+            } else {
                 $invitation = new KuferRegisterAccountInvitation();
                 $invitation->user_id = $member->user_id;
                 $invitation->seminar_id = $this->course->id;
@@ -70,6 +76,30 @@ class IndexController extends StudipController {
                 $invitation->date = time();
                 $invitation->store();
             }
+            $nomail = false;
+        
+        //Komplett einladen
+        } else {
+            foreach($this->course->members as $member){
+                $mapping = KuferMapping::findOneByStudip_id($member->user_id);
+                $user_active = ($this->get_last_lifesign($member->user_id, $this->course->id) || $mapping->claimed);
+                if(!$invitations[$member->user_id] && $mapping && !$user_active){
+                    //send Invitation
+                    $this->sendRegisterMail($member->user_id, $this->course->name);
+                    PageLayout::postMessage(MessageBox::success(_("Einladung versendet an " . $member->email)));
+                    $invitation = new KuferRegisterAccountInvitation();
+                    $invitation->user_id = $member->user_id;
+                    $invitation->seminar_id = $this->course->id;
+                    $invitation->invited_by = User::findCurrent()->id;
+                    $invitation->date = time();
+                    $invitation->store();
+                    $nomail = false;
+                }
+            }
+        }
+        
+        if ($nomail){
+            PageLayout::postMessage(MessageBox::success(_("Keine Einladungen mehr zu verschicken.")));
         }
         $this->redirect('index');
     }

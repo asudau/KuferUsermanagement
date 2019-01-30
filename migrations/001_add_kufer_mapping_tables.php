@@ -8,7 +8,7 @@ class AddKuferMappingTables extends DBMigration {
     public function up () {
         $db = DBManager::get();
         $db->exec("CREATE  TABLE IF NOT EXISTS `kufer_id_mapping` (
-            `kufer_id` VARCHAR(32) NULL ,
+            `kufer_id` int(12) NULL ,
             `studip_id` VARCHAR(32) NULL ,
             `claimed` int(11) NULL ,
             `mkdate` int(11) NULL ,
@@ -16,7 +16,7 @@ class AddKuferMappingTables extends DBMigration {
         )");
 		
         $db->exec("CREATE  TABLE IF NOT EXISTS `kufer_date_id_mapping` (
-            `kufer_id` VARCHAR(32) NULL ,
+            `kufer_id` int(12) NULL ,
             `studip_id` VARCHAR(32) NULL ,
             PRIMARY KEY (`kufer_id`)
         )");
