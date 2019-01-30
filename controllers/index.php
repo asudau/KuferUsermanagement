@@ -70,7 +70,7 @@ class IndexController extends StudipController {
                 $invitation->store();
             } else {
                 $invitation = new KuferRegisterAccountInvitation();
-                $invitation->user_id = $member->user_id;
+                $invitation->user_id = $user_id;
                 $invitation->seminar_id = $this->course->id;
                 $invitation->invited_by = User::findCurrent()->id;
                 $invitation->date = time();
