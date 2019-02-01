@@ -87,9 +87,12 @@ class IndexController extends StudipController {
                     //send Invitation
                     $this->sendRegisterMail($member->user_id, $this->course->name);
                     PageLayout::postMessage(MessageBox::success(_("Einladung versendet an " . $member->email)));
-                    $invitation = new KuferRegisterAccountInvitation();
-                    $invitation->user_id = $member->user_id;
-                    $invitation->seminar_id = $this->course->id;
+                    $invitation = KuferRegisterAccountInvitation::find([$member->user_id, $this->course->id]);
+                    if (!$invitation){
+                        $invitation = new KuferRegisterAccountInvitation();
+                        $invitation->user_id = $member->user_id;
+                        $invitation->seminar_id = $this->course->id;
+                    }
                     $invitation->invited_by = User::findCurrent()->id;
                     $invitation->date = time();
                     $invitation->store();
