@@ -56,7 +56,6 @@ class IndexController extends StudipController {
     
     public function send_register_invitation_action ($user_id = NULL){
         $this->course = Course::findCurrent();
-        $invitations = KuferRegisterAccountInvitation::findBySeminar_id($this->course->id);
         $nomail = true;
 
         //einzelne Einladung
@@ -81,9 +80,10 @@ class IndexController extends StudipController {
         //Komplett einladen
         } else {
             foreach($this->course->members as $member){
+                //Nutzer welche über die KUferschnittstelle angelegt wurden
                 $mapping = KuferMapping::findOneByStudip_id($member->user_id);
                 $user_active = ($this->get_last_lifesign($member->user_id, $this->course->id) || $mapping->claimed);
-                if(!$invitations[$member->user_id] && $mapping && !$user_active){
+                if($mapping && !$user_active){
                     //send Invitation
                     $this->sendRegisterMail($member->user_id, $this->course->name);
                     PageLayout::postMessage(MessageBox::success(_("Einladung versendet an " . $member->email)));
