@@ -1,6 +1,12 @@
 
+<h1>
+    <?= get_title_for_status('autor', 2)?> haben Zugriff auf diesen Kurs ab: 
+    <?= date('d.m.Y', $coursebegin) ?>
+    <a href='<?=$controller->url_for('index/edit_startdate')?>' data-dialog='size=small'  title='Datum ändern' ><?= Icon::create('edit', 'clickable') ?></a>
+</h1>
+<br/>
+<br/>
 
-<h1><?= get_title_for_status('dozent', 2)?>:</h1>
 <table id="keywordstt" class="sortable-table default">
     <thead>
 		<tr>

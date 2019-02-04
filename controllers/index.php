@@ -38,7 +38,9 @@ class IndexController extends StudipController {
         Navigation::activateItem('course/kufer_accounts/index');
         //get teilnehmende where exists kufer mapping and claimed = false
         $this->course = Course::findCurrent();
-        $this->coursebegin = $this->course->dates[0]->date;
+        
+        $this->coursebegin = Studip_VHS::getCourseBegin($this->course->id);
+        
         $this->members = [];
         $this->account_status = [];
         $this->invitations = [];
@@ -106,44 +108,18 @@ class IndexController extends StudipController {
         }
         $this->redirect('index');
     }
-    
-
-//    public function create_action()
-//    {
-//      $user = $this->new_user();  
-//
-//          $user->email = 'asudau@uos.de';
-//          $user->first_name = 'unbekannt';
-//          $user->last_name = 'unbekannt';
-//          
-//          $i = 1;
-//          $user_name = substr($this->sonderzeichen($user->first_name), 0, $i) . $this->sonderzeichen($user->last_name);
-//          while (Studip_User::find_by_user_name($user_name) && $i<= strlen($this->sonderzeichen($user->first_name))){
-//              $i++;
-//              $user_name = substr($this->sonderzeichen($user->first_name), 0, $i) . $this->sonderzeichen($user->last_name);
-//          }
-//
-//          
-//          
-//          $md5_user = new User();
-//          $md5_user->username = $user_name;
-//          $md5_user->vorname = '';
-//          $md5_user->nachname = 'Vorläufiger Nutzer';
-//          $md5_user->email = $user->email;
-//          $md5_user->perms = $user->permission;
-//          $md5_user->auth_plugin = $user->auth_plugin;
-//          
-//          if (!$md5_user->store())
-//              return new Studip_Ws_Fault(self::parse_msg_to_clean_text($user->error));
-//
-//          $entry = new KuferMapping();
-//          $entry->studip_id = $md5_user->user_id;
-//          $entry->claimed = false;
-//          $entry->store();
-//          $user->id = $entry->ID;
-//        
-//    }
    
+    public function edit_startdate_action(){
+        $this->coursebegin = Studip_VHS::getCourseBegin(Course::findCurrent()->id);
+    }
+    
+    public function set_startdate_action(){
+        $date = DateTime::createFromFormat('Y-m-d', Request::get('start_date'));
+        if (Studip_VHS::setCourseBegin(Course::findCurrent()->id, $date->getTimestamp())){
+             PageLayout::postMessage(MessageBox::success(_("Datum wurde gespeichert.")));
+        }
+        $this->redirect('index');
+    }
     
     private function get_last_lifesign($user_id){
         $db = DBManager::get();
