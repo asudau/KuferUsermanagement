@@ -204,7 +204,7 @@ class IndexController extends StudipController {
                     
                 Sie haben sich für den Kurs " . $kursname . " an der " . $GLOBALS['UNI_NAME_CLEAN'] . " angemeldet.
                     
-                Die " . $GLOBALS['UNI_NAME_CLEAN'] . " stellt Ihnen eine online-Lernpattform zur Verfügung, welche zum Beispiel Kommunikation untersützt,
+                Die " . $GLOBALS['UNI_NAME_CLEAN'] . " stellt Ihnen eine online-Lernpattform zur Verfügung, welche zum Beispiel Kommunikation unterstützt,
                 die zusätzliche Bereitstellung von Kursinhalten ermöglicht und vieles mehr.
                 
                 Ob Sie dieses Angebot nutzen möchten, entscheiden Sie selbst.
