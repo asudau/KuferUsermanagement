@@ -130,12 +130,12 @@ jQuery(document).ready(function() {
 
     <section class="vgroup">
         <label>
-            <input type="radio" checked name="account_settings" value="0">
+            <input type="radio" checked name="account_settings" value="aktivitaet">
             <?= _("Accountlöschung gemäß Nutzungsbedingungen (Nach längerer Inaktivität mit vorheriger Benachrichtigung oder auf expliziten Wunsch)") ?>
         </label>
 
         <label>
-            <input type="radio"  name="account_settings" value="1">
+            <input type="radio"  name="account_settings" value="course_end">
             <?= _("Account automatisch nach Kursende löschen") ?>
         </label>
 

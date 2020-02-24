@@ -57,6 +57,19 @@ class RegisterController extends StudipController {
         $Nachname = trim(Request::get('Nachname'));
         
         //TODO account_settings setzen in Usermanagement delete_mode
+        if (Request::get('account_settings') == 'aktivitaet'){
+            $status_info = new UsermanagementAccountStatus($user_id);
+            $status_info->delete_mode = 'aktivitaet';
+            $status_info->account_status = 0;
+            $status_info->chdate = time();
+            $status_info->store();
+        } else {
+            $status_info = new UsermanagementAccountStatus($user_id);
+            $status_info->delete_mode = 'course_end';
+            $status_info->account_status = 0;
+            $status_info->chdate = time();
+            $status_info->store();
+        }
         
         $user = User::find($user_id);
         if ($user->username != $username){
